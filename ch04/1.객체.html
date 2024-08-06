@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1.객체</title>
+    <script src="./js/Account.js"></script>
+    <!--
+        날짜 : 2024-08-05
+        이름 : 이도영
+        내용 : 자바스크립트 객체 실습하기
+    -->
+</head>
+<body>
+    <script>
+        //클래스 정의 객체
+        const kb = new Account('국민은행','111-11-1111','김유신',10000);
+        kb.deposit(1000);
+        kb.show();
+
+        kb.withdraw(2000);
+        kb.show();
+
+        //사용자 정의객체
+        const sonata = {
+            brand : '소나타',
+            color: '흰색',
+            speed: 0,
+
+            speedUp : function(speed){
+                this.speed += speed;
+            },
+            speedDown : function(speed){
+                this.speed -= speed;
+            },
+            show: function(){
+                document.write('차량명 : ' + this.brand + '<br>');
+                document.write('차량색 : ' + this.color + '<br>');
+                document.write('현재속도 : ' + this.speed + '<br>');
+            }
+        };
+        sonata.speedUp(100);
+        sonata.speedDown(20);
+        sonata.show();
+    </script>
+</body>
+</html>
