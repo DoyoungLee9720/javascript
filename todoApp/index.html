@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoList</title>
+    <style>
+        * {
+            margin: 0px;
+            padding: 0px;
+            font: normal 23px 'Inter';
+        }
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid black;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        h3 {
+            background-color: rgb(69, 59, 209);
+            color: white;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .container {
+            width: 800px;
+            padding: 20px;
+        }
+        .input-container {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+        }
+        #todoInput {
+            padding: 10px;
+            border-radius: 5px;
+            flex: 1; 
+            margin-right: 10px; 
+            box-sizing: border-box; 
+            max-width: calc(100% - 70px); 
+        }
+        .plus {
+            background-color: rgb(69, 59, 209);
+            color: white;
+            padding: 10px;
+            border: 0;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .plus:hover {
+            color: white;
+            background-color: rgb(161, 161, 255);
+        }
+        .delete-btn {
+            color: black;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+            flex-shrink: 0;
+            background-color: white;
+        }
+        .delete-btn:hover {
+            background-color: darkgray;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3>ToDo List</h3>
+        <div class="input-container">
+            <input type="text" id="todoInput" placeholder="할일을 입력하세요">
+            <button class="plus">추가</button>
+        </div>
+        <ol id="todoUpdated"></ol>
+    </div>
+    <script>
+        // 할 일 추가 기능
+        const addBtn = document.querySelector('.plus');
+        addBtn.addEventListener('click', () => {
+            const todoInput = document.querySelector('#todoInput');
+            if (todoInput.value !== '') {
+                const todoUpdated = document.querySelector('#todoUpdated');
+                const newLi = document.createElement('li');
+                const newBtn = document.createElement('button');
+                const newSpan = document.createElement('span');
+
+                const itemNumber = todoUpdated.children.length + 1;
+                newSpan.textContent = `${itemNumber}. ${todoInput.value}`;
+                newBtn.textContent = 'X';
+                newBtn.classList.add('delete-btn');
+
+                newLi.appendChild(newSpan);
+                newLi.appendChild(newBtn);
+
+                todoUpdated.appendChild(newLi);
+
+                todoInput.value = '';
+
+                newBtn.addEventListener('click', () => {
+                    todoUpdated.removeChild(newLi);
+                    updateItemNumbers();
+                    saveItems();
+                });
+
+                saveItems();
+            }
+        });
+
+        // 번호 업데이트
+        function updateItemNumbers() {
+            const todoUpdated = document.querySelector('#todoUpdated');
+            for (let i = 0; i < todoUpdated.children.length; i++) {
+                const itemNumber = i + 1;
+                const newSpan = todoUpdated.children[i].querySelector('span');
+                newSpan.textContent = `${itemNumber}. ${newSpan.textContent.split('. ')[1]}`;
+            }
+        }
+
+        // 데이터 저장하기
+        function saveItems() {
+            const saveItems = [];
+            const todoList = document.querySelector('#todoUpdated');
+            for (let i = 0; i < todoList.children.length; i++) {
+                const todoObj = {
+                    contents: todoList.children[i].querySelector('span').textContent,
+                };
+                saveItems.push(todoObj);
+            }
+
+            if (saveItems.length === 0) {
+                localStorage.removeItem('saved-items');
+            } else {
+                localStorage.setItem('saved-items', JSON.stringify(saveItems));
+            }
+        }
+
+        // 로컬 스토리지에서 데이터 불러오기
+        function loadItems() {
+            const savedItems = localStorage.getItem('saved-items');
+            if (savedItems) {
+                const todoList = document.querySelector('#todoUpdated');
+                const parsedItems = JSON.parse(savedItems);
+                parsedItems.forEach((item, index) => {
+                    const newLi = document.createElement('li');
+                    const newSpan = document.createElement('span');
+                    const newBtn = document.createElement('button');
+                    
+                    newSpan.textContent = `${index + 1}. ${item.contents.split('. ')[1]}`;
+                    newBtn.textContent = 'X';
+                    newBtn.classList.add('delete-btn');
+
+                    newLi.appendChild(newSpan);
+                    newLi.appendChild(newBtn);
+                    todoList.appendChild(newLi);
+
+                    newBtn.addEventListener('click', () => {
+                        todoList.removeChild(newLi);
+                        updateItemNumbers(); // 번호 재정렬
+                        saveItems();
+                    });
+                });
+            }
+        }
+
+        // 페이지가 로드될 때 저장된 데이터 불러오기
+        window.onload = () => {
+            loadItems();
+        };
+
+        
+    </script>
+</body>
+</html>
